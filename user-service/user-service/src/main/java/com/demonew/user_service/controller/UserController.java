@@ -37,4 +37,26 @@ public class UserController {
     public User createUser(@RequestBody User user) {
         return userRepository.save(user);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+        return userRepository.findById(id)
+                .map(existingUser -> {
+                    existingUser.setName(updatedUser.getName());
+                    existingUser.setEmail(updatedUser.getEmail());
+                    return ResponseEntity.ok(userRepository.save(existingUser));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        return userRepository.findById(id)
+                .map(user -> {
+                    userRepository.deleteById(id);
+                    return ResponseEntity.ok("User deleted successfully");
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 }
